@@ -2,6 +2,7 @@
 bin/
 gen/
 app/build
+app/build.gradle
 
 # Local configuration file (sdk path, etc)
 project.properties
@@ -10,3 +11,4 @@ project.properties
 .project
 .idea
 .gradle
+local.properties
