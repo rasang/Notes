@@ -28,7 +28,7 @@ import java.util.HashMap;
 public class Contact {
     private static HashMap<String, String> sContactCache;
     private static final String TAG = "Contact";
-
+    //selection语句，用于筛选结果
     private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL(" + Phone.NUMBER
     + ",?) AND " + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'"
     + " AND " + Data.RAW_CONTACT_ID + " IN "
@@ -36,24 +36,31 @@ public class Contact {
             + " FROM phone_lookup"
             + " WHERE min_match = '+')";
 
+    /**
+     * 获得联系人
+     * @param context 上下文
+     * @param phoneNumber 电话号码
+     * @return
+     */
     public static String getContact(Context context, String phoneNumber) {
         if(sContactCache == null) {
             sContactCache = new HashMap<String, String>();
         }
-
+        // cache中包含电话号码 直接获得后返回
         if(sContactCache.containsKey(phoneNumber)) {
             return sContactCache.get(phoneNumber);
         }
-
+        // 将电话号码经过格式处理后放入sql语句
         String selection = CALLER_ID_SELECTION.replace("+",
                 PhoneNumberUtils.toCallerIDMinMatch(phoneNumber));
+        // 使用内容解析器查询联系人姓名，通过指定号码phoneNumber筛选
         Cursor cursor = context.getContentResolver().query(
                 Data.CONTENT_URI,
                 new String [] { Phone.DISPLAY_NAME },
                 selection,
                 new String[] { phoneNumber },
                 null);
-
+        // 从结果中筛选，将姓名和电话号码作为键值对放入cache
         if (cursor != null && cursor.moveToFirst()) {
             try {
                 String name = cursor.getString(0);

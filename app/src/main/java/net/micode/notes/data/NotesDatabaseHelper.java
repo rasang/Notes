@@ -41,7 +41,7 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "NotesDatabaseHelper";
 
     private static NotesDatabaseHelper mInstance;
-
+    // 建立note表
     private static final String CREATE_NOTE_TABLE_SQL =
         "CREATE TABLE " + TABLE.NOTE + "(" +
             NoteColumns.ID + " INTEGER PRIMARY KEY," +
@@ -62,7 +62,7 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
             NoteColumns.GTASK_ID + " TEXT NOT NULL DEFAULT ''," +
             NoteColumns.VERSION + " INTEGER NOT NULL DEFAULT 0" +
         ")";
-
+    // 建立data表
     private static final String CREATE_DATA_TABLE_SQL =
         "CREATE TABLE " + TABLE.DATA + "(" +
             DataColumns.ID + " INTEGER PRIMARY KEY," +
@@ -77,7 +77,7 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
             DataColumns.DATA4 + " TEXT NOT NULL DEFAULT ''," +
             DataColumns.DATA5 + " TEXT NOT NULL DEFAULT ''" +
         ")";
-
+    // 建立索引
     private static final String CREATE_DATA_NOTE_ID_INDEX_SQL =
         "CREATE INDEX IF NOT EXISTS note_id_index ON " +
         TABLE.DATA + "(" + DataColumns.NOTE_ID + ");";
@@ -209,14 +209,14 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
     public NotesDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
-
+    // 使用建表语句创建note表，并创建触发器
     public void createNoteTable(SQLiteDatabase db) {
         db.execSQL(CREATE_NOTE_TABLE_SQL);
         reCreateNoteTableTriggers(db);
         createSystemFolder(db);
         Log.d(TAG, "note table has been created");
     }
-
+    // 重新创建Note表触发器
     private void reCreateNoteTableTriggers(SQLiteDatabase db) {
         db.execSQL("DROP TRIGGER IF EXISTS increase_folder_count_on_update");
         db.execSQL("DROP TRIGGER IF EXISTS decrease_folder_count_on_update");
@@ -269,14 +269,14 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
         values.put(NoteColumns.TYPE, Notes.TYPE_SYSTEM);
         db.insert(TABLE.NOTE, null, values);
     }
-
+    // 执行sql语句创建data表
     public void createDataTable(SQLiteDatabase db) {
         db.execSQL(CREATE_DATA_TABLE_SQL);
         reCreateDataTableTriggers(db);
         db.execSQL(CREATE_DATA_NOTE_ID_INDEX_SQL);
         Log.d(TAG, "data table has been created");
     }
-
+    // 重新创建data表触发器
     private void reCreateDataTableTriggers(SQLiteDatabase db) {
         db.execSQL("DROP TRIGGER IF EXISTS update_note_content_on_insert");
         db.execSQL("DROP TRIGGER IF EXISTS update_note_content_on_update");
@@ -299,12 +299,12 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
         createNoteTable(db);
         createDataTable(db);
     }
-
+    // 一个版本迭代的函数
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         boolean reCreateTriggers = false;
         boolean skipV2 = false;
-
+        // 根据版本从低到高逐渐更新
         if (oldVersion == 1) {
             upgradeToV2(db);
             skipV2 = true; // this upgrade including the upgrade from v2 to v3
@@ -332,14 +332,14 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
                     + "fails");
         }
     }
-
+    // 升级到v2版本
     private void upgradeToV2(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE.NOTE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE.DATA);
         createNoteTable(db);
         createDataTable(db);
     }
-
+    // 升级到v3版本
     private void upgradeToV3(SQLiteDatabase db) {
         // drop unused triggers
         db.execSQL("DROP TRIGGER IF EXISTS update_note_modified_date_on_insert");
@@ -354,7 +354,7 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
         values.put(NoteColumns.TYPE, Notes.TYPE_SYSTEM);
         db.insert(TABLE.NOTE, null, values);
     }
-
+    // 升级到v4版本
     private void upgradeToV4(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE.NOTE + " ADD COLUMN " + NoteColumns.VERSION
                 + " INTEGER NOT NULL DEFAULT 0");
