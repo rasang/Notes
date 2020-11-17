@@ -28,18 +28,19 @@ import net.micode.notes.tool.DataUtils;
 
 public class NoteItemData {
     static final String [] PROJECTION = new String [] {
-        NoteColumns.ID,
-        NoteColumns.ALERTED_DATE,
-        NoteColumns.BG_COLOR_ID,
-        NoteColumns.CREATED_DATE,
-        NoteColumns.HAS_ATTACHMENT,
-        NoteColumns.MODIFIED_DATE,
-        NoteColumns.NOTES_COUNT,
-        NoteColumns.PARENT_ID,
-        NoteColumns.SNIPPET,
-        NoteColumns.TYPE,
-        NoteColumns.WIDGET_ID,
-        NoteColumns.WIDGET_TYPE,
+        NoteColumns.ID,             //The unique ID for a row（每行唯一的id）
+        NoteColumns.ALERTED_DATE,   //Alert date（弹出日期）
+        NoteColumns.BG_COLOR_ID,    //Note's background color's id（便签背景颜色的id）
+        NoteColumns.CREATED_DATE,   //Created data for note or folder（为文件夹或者便签写数据）
+        NoteColumns.HAS_ATTACHMENT, //For text note, it doesn't has attachment, for multi-media（多媒体没有附件）
+                                    //note, it has at least one attachment（便签至少有一个附件）
+        NoteColumns.MODIFIED_DATE,  //Latest modified date（最新更改的日期）
+        NoteColumns.NOTES_COUNT,    //Folder's count of notes（文件夹里面notes的数量）
+        NoteColumns.PARENT_ID,      //The parent's id for note or folder（文件夹或者便签的父id）
+        NoteColumns.SNIPPET,        //Folder's name or text content of note（文件夹的名字，或者便签的内容）
+        NoteColumns.TYPE,           //The file type: folder or note（文件的类型，是文件夹还是便签）
+        NoteColumns.WIDGET_ID,      //Note's widget id（便签的小部件id）
+        NoteColumns.WIDGET_TYPE,    //Note's widget type（便签的小部件类型）
     };
 
     private static final int ID_COLUMN                    = 0;
@@ -76,6 +77,7 @@ public class NoteItemData {
     private boolean mIsOneNoteFollowingFolder;
     private boolean mIsMultiNotesFollowingFolder;
 
+    //加载光标对应的行号
     public NoteItemData(Context context, Cursor cursor) {
         mId = cursor.getLong(ID_COLUMN);
         mAlertDate = cursor.getLong(ALERTED_DATE_COLUMN);
@@ -86,6 +88,7 @@ public class NoteItemData {
         mNotesCount = cursor.getInt(NOTES_COUNT_COLUMN);
         mParentId = cursor.getLong(PARENT_ID_COLUMN);
         mSnippet = cursor.getString(SNIPPET_COLUMN);
+        //使用□或者√进行替换
         mSnippet = mSnippet.replace(NoteEditActivity.TAG_CHECKED, "").replace(
                 NoteEditActivity.TAG_UNCHECKED, "");
         mType = cursor.getInt(TYPE_COLUMN);
@@ -93,8 +96,11 @@ public class NoteItemData {
         mWidgetType = cursor.getInt(WIDGET_TYPE_COLUMN);
 
         mPhoneNumber = "";
+        //如果父id是通话记录
         if (mParentId == Notes.ID_CALL_RECORD_FOLDER) {
+            //获取通话记录里面的电话号码
             mPhoneNumber = DataUtils.getCallNumberByNoteId(context.getContentResolver(), mId);
+            //如果没有电话号码，就获取名字
             if (!TextUtils.isEmpty(mPhoneNumber)) {
                 mName = Contact.getContact(context, mPhoneNumber);
                 if (mName == null) {
@@ -109,6 +115,9 @@ public class NoteItemData {
         checkPostion(cursor);
     }
 
+    /**
+     * 确认光标位置
+     */
     private void checkPostion(Cursor cursor) {
         mIsLastItem = cursor.isLast() ? true : false;
         mIsFirstItem = cursor.isFirst() ? true : false;
@@ -117,10 +126,14 @@ public class NoteItemData {
         mIsOneNoteFollowingFolder = false;
 
         if (mType == Notes.TYPE_NOTE && !mIsFirstItem) {
+            //获取光标位置
             int position = cursor.getPosition();
+            //回退光标
             if (cursor.moveToPrevious()) {
+                //判断类型是文件夹还是系统文件夹
                 if (cursor.getInt(TYPE_COLUMN) == Notes.TYPE_FOLDER
                         || cursor.getInt(TYPE_COLUMN) == Notes.TYPE_SYSTEM) {
+                    //如果文件数目大于1，就返回mIsMultiNotesFollowingFolder
                     if (cursor.getCount() > (position + 1)) {
                         mIsMultiNotesFollowingFolder = true;
                     } else {
@@ -214,6 +227,7 @@ public class NoteItemData {
         return (mAlertDate > 0);
     }
 
+    //判断是否是通话记录
     public boolean isCallRecord() {
         return (mParentId == Notes.ID_CALL_RECORD_FOLDER && !TextUtils.isEmpty(mPhoneNumber));
     }
