@@ -16,6 +16,7 @@
 
 package net.micode.notes.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -49,20 +51,20 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);//去除标题栏
 
         final Window win = getWindow();
-        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);//窗口可以在锁屏的窗口之上显示
+        //当屏幕不亮的时候，添加flag
         if (!isScreenOn()) {
-            win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR);
+            win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON  //只要窗口可见，保持屏幕常亮
+                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON  //窗口显示时将屏幕点亮
+                    | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON  //只要窗口可见，就允许再开启状态的屏幕上锁屏
+                    | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR);  //确保窗口内容不会被装饰条（状态栏）盖住
         }
 
-        Intent intent = getIntent();
-
+        Intent intent = getIntent();//创建一个意图
+        //得到Note的id和片段
         try {
             mNoteId = Long.valueOf(intent.getData().getPathSegments().get(1));
             mSnippet = DataUtils.getSnippetById(this.getContentResolver(), mNoteId);
@@ -74,7 +76,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
             return;
         }
 
-        mPlayer = new MediaPlayer();
+        mPlayer = new MediaPlayer();//创建一个播放器
         if (DataUtils.visibleInNoteDatabase(getContentResolver(), mNoteId, Notes.TYPE_NOTE)) {
             showActionDialog();
             playAlarmSound();
@@ -82,12 +84,16 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
             finish();
         }
     }
-
+    /*
+    * 判断屏幕是否亮着
+    * */
     private boolean isScreenOn() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         return pm.isScreenOn();
     }
-
+    /*
+    * 播放警告音乐
+    * */
     private void playAlarmSound() {
         Uri url = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
 
@@ -118,36 +124,47 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
             e.printStackTrace();
         }
     }
-
+    /*
+    * 弹出动作会话框
+    * 设置Title为：Notes
+    * 设置Message为：mSnippet
+    * 设置点击按钮为：Got it
+    * */
     private void showActionDialog() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle(R.string.app_name);
         dialog.setMessage(mSnippet);
-        dialog.setPositiveButton(R.string.notealert_ok, this);
-        if (isScreenOn()) {
-            dialog.setNegativeButton(R.string.notealert_enter, this);
+        dialog.setPositiveButton("Got it", this);
+        if (isScreenOn()) { //如果屏幕亮着，设置取消按钮为：Take a look
+            dialog.setNegativeButton("Take a look", this);
         }
-        dialog.show().setOnDismissListener(this);
+        dialog.show().setOnDismissListener(this);//触发dialog
     }
-
+    /*
+    * 跳转到NoteEditActivity，并传递mNoteId的值
+    * */
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_NEGATIVE:
                 Intent intent = new Intent(this, NoteEditActivity.class);
                 intent.setAction(Intent.ACTION_VIEW);
-                intent.putExtra(Intent.EXTRA_UID, mNoteId);
+                intent.putExtra(Intent.EXTRA_UID, mNoteId); //传递mNoteId的值
                 startActivity(intent);
                 break;
             default:
                 break;
         }
     }
-
+    /*
+    * 退出窗口
+    * */
     public void onDismiss(DialogInterface dialog) {
         stopAlarmSound();
         finish();
     }
-
+    /*
+    * 关闭警告提示音
+    * */
     private void stopAlarmSound() {
         if (mPlayer != null) {
             mPlayer.stop();
