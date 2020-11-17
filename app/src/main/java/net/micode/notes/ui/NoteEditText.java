@@ -55,22 +55,26 @@ public class NoteEditText extends EditText {
 
     /**
      * Call by the {@link NoteEditActivity} to delete or add edit text
+     * 定义一个接口，里面定义了删除和添加文本的方法
      */
     public interface OnTextViewChangeListener {
         /**
          * Delete current edit text when {@link KeyEvent#KEYCODE_DEL} happens
          * and the text is null
+         * 当监听到删除键，就删除当前的文本
          */
         void onEditTextDelete(int index, String text);
 
         /**
          * Add edit text after current edit text when {@link KeyEvent#KEYCODE_ENTER}
          * happen
+         * 当监听到回车键，就将当前的文本追加到之前的编辑上
          */
         void onEditTextEnter(int index, String text);
 
         /**
          * Hide or show item option when text change
+         * 当文本改变的时候是否显示item选择
          */
         void onTextChange(int index, boolean hasText);
     }
@@ -102,34 +106,38 @@ public class NoteEditText extends EditText {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN://屏幕按下事件
 
-                int x = (int) event.getX();
-                int y = (int) event.getY();
-                x -= getTotalPaddingLeft();
-                y -= getTotalPaddingTop();
-                x += getScrollX();
-                y += getScrollY();
+                int x = (int) event.getX();//获取x坐标
+                int y = (int) event.getY();//获取y坐标
+                x -= getTotalPaddingLeft();//x坐标减去左边内边距的距离
+                y -= getTotalPaddingTop();//y坐标减去上边内边距的距离
+                x += getScrollX();//相对于屏幕原点在X轴上的偏移量
+                y += getScrollY();//相对于屏幕原点在Y轴上的偏移量
 
                 Layout layout = getLayout();
-                int line = layout.getLineForVertical(y);
-                int off = layout.getOffsetForHorizontal(line, x);
-                Selection.setSelection(getText(), off);
+                int line = layout.getLineForVertical(y);//得到某点在垂直方向上的行数值
+                int off = layout.getOffsetForHorizontal(line, x);//得到触摸点在textView中垂直方向上的行数值。参数是触摸点在Y轴上的偏移量
+                Selection.setSelection(getText(), off);//移动光标到偏移索引
                 break;
         }
 
         return super.onTouchEvent(event);
     }
 
+    /**
+     * 监听键盘事件
+     * 事件会在用户按下一个键盘按键时发生
+     **/
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_ENTER://监听回车
                 if (mOnTextViewChangeListener != null) {
                     return false;
                 }
                 break;
-            case KeyEvent.KEYCODE_DEL:
+            case KeyEvent.KEYCODE_DEL://监听删除键
                 mSelectionStartBeforeDelete = getSelectionStart();
                 break;
             default:
@@ -138,10 +146,14 @@ public class NoteEditText extends EditText {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 监听键盘事件
+     * 事件会在键盘按键被松开时发生
+     **/
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch(keyCode) {
-            case KeyEvent.KEYCODE_DEL:
+            case KeyEvent.KEYCODE_DEL://当松开删除键，就将光标所在的文本进行删除
                 if (mOnTextViewChangeListener != null) {
                     if (0 == mSelectionStartBeforeDelete && mIndex != 0) {
                         mOnTextViewChangeListener.onEditTextDelete(mIndex, getText().toString());
@@ -151,7 +163,7 @@ public class NoteEditText extends EditText {
                     Log.d(TAG, "OnTextViewChangeListener was not seted");
                 }
                 break;
-            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_ENTER://当松开回车键，将输入的文本追加进去
                 if (mOnTextViewChangeListener != null) {
                     int selectionStart = getSelectionStart();
                     String text = getText().subSequence(selectionStart, length()).toString();
@@ -167,6 +179,9 @@ public class NoteEditText extends EditText {
         return super.onKeyUp(keyCode, event);
     }
 
+    /**
+     * 焦点改变
+     **/
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         if (mOnTextViewChangeListener != null) {
@@ -179,16 +194,21 @@ public class NoteEditText extends EditText {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
     }
 
+    /**
+     * spanned:这是一个针对文本的接口，用来标记在文本的某些范围之类，附属了哪些对象。
+     * 识别被标记的对象，判断属于哪种服务，（邮件，电话，网页）
+     * 然后弹出相应的菜单
+     */
     @Override
     protected void onCreateContextMenu(ContextMenu menu) {
         if (getText() instanceof Spanned) {
-            int selStart = getSelectionStart();
-            int selEnd = getSelectionEnd();
+            int selStart = getSelectionStart();//来获取标记范围参数
+            int selEnd = getSelectionEnd();//来获取标记范围参数
 
             int min = Math.min(selStart, selEnd);
             int max = Math.max(selStart, selEnd);
 
-            final URLSpan[] urls = ((Spanned) getText()).getSpans(min, max, URLSpan.class);
+            final URLSpan[] urls = ((Spanned) getText()).getSpans(min, max, URLSpan.class);//将标记的字符串存为数组
             if (urls.length == 1) {
                 int defaultResId = 0;
                 for(String schema: sSchemaActionResMap.keySet()) {
