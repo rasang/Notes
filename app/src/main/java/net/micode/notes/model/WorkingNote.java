@@ -33,17 +33,19 @@ import net.micode.notes.tool.ResourceParser.NoteBgResources;
 
 
 public class WorkingNote {
-    // Note for the working note
+    // Note for the working note 应该是已经有的便签
     private Note mNote;
     // Note Id
     private long mNoteId;
-    // Note content
+    // Note content 便签内容
     private String mContent;
-    // Note mode
+    // Note mode 便签模式
     private int mMode;
 
+    // 警报日期（直译有点奇怪，不知道用来做什么）
     private long mAlertDate;
 
+    // 修改日期
     private long mModifiedDate;
 
     private int mBgColorId;
@@ -52,6 +54,7 @@ public class WorkingNote {
 
     private int mWidgetType;
 
+    // 文件夹Id
     private long mFolderId;
 
     private Context mContext;
@@ -101,10 +104,11 @@ public class WorkingNote {
 
     private static final int NOTE_MODIFIED_DATE_COLUMN = 5;
 
-    // New note construct
+    // New note construct 新便签的构造
     private WorkingNote(Context context, long folderId) {
         mContext = context;
         mAlertDate = 0;
+        // 获取系统当前时间，赋值为‘修改便签时间’,进行初始化
         mModifiedDate = System.currentTimeMillis();
         mFolderId = folderId;
         mNote = new Note();
@@ -114,8 +118,9 @@ public class WorkingNote {
         mWidgetType = Notes.TYPE_WIDGET_INVALIDE;
     }
 
-    // Existing note construct
+    // Existing note construct  构造现有便签
     private WorkingNote(Context context, long noteId, long folderId) {
+        // 赋值
         mContext = context;
         mNoteId = noteId;
         mFolderId = folderId;
@@ -124,11 +129,14 @@ public class WorkingNote {
         loadNote();
     }
 
+    // 加载便签
     private void loadNote() {
+        // cursor每行的集合，是获得的满足条件（就是我们query方法中传入的条件参数）的所有行，获取便签数据
         Cursor cursor = mContext.getContentResolver().query(
                 ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, mNoteId), NOTE_PROJECTION, null,
                 null, null);
 
+        // 获取便签数据
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 mFolderId = cursor.getLong(NOTE_PARENT_ID_COLUMN);
@@ -200,6 +208,7 @@ public class WorkingNote {
 
             /**
              * Update widget content if there exist any widget of this note
+             * 如果存在此便签的任何小装置，更新小装置
              */
             if (mWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
                     && mWidgetType != Notes.TYPE_WIDGET_INVALIDE
@@ -212,10 +221,12 @@ public class WorkingNote {
         }
     }
 
+    // 数据库中存在此数据，返回id
     public boolean existInDatabase() {
         return mNoteId > 0;
     }
 
+    // 若便签在数据库中不存在，则不保存
     private boolean isWorthSaving() {
         if (mIsDeleted || (!existInDatabase() && TextUtils.isEmpty(mContent))
                 || (existInDatabase() && !mNote.isLocalModified())) {
@@ -225,6 +236,7 @@ public class WorkingNote {
         }
     }
 
+    // 设置状态更改监听器
     public void setOnSettingStatusChangedListener(NoteSettingChangedListener l) {
         mNoteSettingStatusListener = l;
     }
@@ -239,14 +251,17 @@ public class WorkingNote {
         }
     }
 
+    // 标记已删除
     public void markDeleted(boolean mark) {
         mIsDeleted = mark;
         if (mWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
                 && mWidgetType != Notes.TYPE_WIDGET_INVALIDE && mNoteSettingStatusListener != null) {
+                // 改变相应的值
                 mNoteSettingStatusListener.onWidgetChanged();
         }
     }
 
+    //设置背景颜色
     public void setBgColorId(int id) {
         if (id != mBgColorId) {
             mBgColorId = id;
@@ -257,6 +272,7 @@ public class WorkingNote {
         }
     }
 
+    // 设置检查列表模式
     public void setCheckListMode(int mode) {
         if (mMode != mode) {
             if (mNoteSettingStatusListener != null) {
@@ -342,26 +358,35 @@ public class WorkingNote {
         return mWidgetType;
     }
 
+    /**
+     * 设置监听器
+     */
     public interface NoteSettingChangedListener {
         /**
          * Called when the background color of current note has just changed
+         * 当便签背景颜色刚刚更改时调用
          */
         void onBackgroundColorChanged();
 
         /**
          * Called when user set clock
+         * 当用户设置时钟时调用
          */
         void onClockAlertChanged(long date, boolean set);
 
         /**
          * Call when user create note from widget
+         * 当用户从‘小装置（桌面小装置）’创建便签时调用
          */
         void onWidgetChanged();
 
         /**
          * Call when switch between check list mode and normal mode
+         * 在‘检查列表模式’和‘正常模式’之间，切换时调用
          * @param oldMode is previous mode before change
+         * 参数oldMode是更改前的前一个模式
          * @param newMode is new mode
+         * 参数newMode是新模式
          */
         void onCheckListModeChanged(int oldMode, int newMode);
     }
