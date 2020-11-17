@@ -40,18 +40,23 @@ public class Note {
     private static final String TAG = "Note";
     /**
      * Create a new note id for adding a new note to databases
+     * 创建一个新的便签id，用于向数据库中添加新便签
      */
     public static synchronized long getNewNoteId(Context context, long folderId) {
-        // Create a new note in the database
+        // Create a new note in the database 在数据库中创建一个新的便签
         ContentValues values = new ContentValues();
+        // 获取当前系统时间
         long createdTime = System.currentTimeMillis();
+        // 设置默认值
         values.put(NoteColumns.CREATED_DATE, createdTime);
         values.put(NoteColumns.MODIFIED_DATE, createdTime);
         values.put(NoteColumns.TYPE, Notes.TYPE_NOTE);
         values.put(NoteColumns.LOCAL_MODIFIED, 1);
         values.put(NoteColumns.PARENT_ID, folderId);
+        // 将新建的标签插入数据库中
         Uri uri = context.getContentResolver().insert(Notes.CONTENT_NOTE_URI, values);
 
+        // 插入成功需要返回记录的id，否则返回-1
         long noteId = 0;
         try {
             noteId = Long.valueOf(uri.getPathSegments().get(1));
@@ -100,6 +105,7 @@ public class Note {
         return mNoteDiffValues.size() > 0 || mNoteData.isLocalModified();
     }
 
+    // 同步便签
     public boolean syncNote(Context context, long noteId) {
         if (noteId <= 0) {
             throw new IllegalArgumentException("Wrong note id:" + noteId);
@@ -113,12 +119,14 @@ public class Note {
          * In theory, once data changed, the note should be updated on {@link NoteColumns#LOCAL_MODIFIED} and
          * {@link NoteColumns#MODIFIED_DATE}. For data safety, though update note fails, we also update the
          * note data info
+         * 理论上来说，一旦数据发生改变，便签就会在{@link NoteColumns#LOCAL_MODIFIED} 和 {@link NoteColumns#MODIFIED_DATE}上更新
+         * 为了保证数据安全，就算数据更新失败，我们依然会更新便签的数据信息
          */
         if (context.getContentResolver().update(
                 ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId), mNoteDiffValues, null,
                 null) == 0) {
             Log.e(TAG, "Update note error, should not happen");
-            // Do not return, fall through
+            // Do not return, fall through  更新失败，还是会继续进行
         }
         mNoteDiffValues.clear();
 
@@ -142,6 +150,7 @@ public class Note {
         private static final String TAG = "NoteData";
 
         public NoteData() {
+            // 创建Text和Call的数据存储
             mTextDataValues = new ContentValues();
             mCallDataValues = new ContentValues();
             mTextDataId = 0;
@@ -168,7 +177,9 @@ public class Note {
 
         void setCallData(String key, String value) {
             mCallDataValues.put(key, value);
+            // 将local_modified 和 1连接成一个新的Uri(标识、定位任何资源的字符串)
             mNoteDiffValues.put(NoteColumns.LOCAL_MODIFIED, 1);
+            // 将modified_date 和 当前时间 连接成一个新的Uri(标识、定位任何资源的字符串)
             mNoteDiffValues.put(NoteColumns.MODIFIED_DATE, System.currentTimeMillis());
         }
 
@@ -178,9 +189,10 @@ public class Note {
             mNoteDiffValues.put(NoteColumns.MODIFIED_DATE, System.currentTimeMillis());
         }
 
+        // 推入内容解析程序
         Uri pushIntoContentResolver(Context context, long noteId) {
             /**
-             * Check for safety
+             * Check for safety 检查安全
              */
             if (noteId <= 0) {
                 throw new IllegalArgumentException("Wrong note id:" + noteId);
@@ -190,11 +202,13 @@ public class Note {
             ContentProviderOperation.Builder builder = null;
 
             if(mTextDataValues.size() > 0) {
+                // 根据 id 生成连接
                 mTextDataValues.put(DataColumns.NOTE_ID, noteId);
                 if (mTextDataId == 0) {
                     mTextDataValues.put(DataColumns.MIME_TYPE, TextNote.CONTENT_ITEM_TYPE);
                     Uri uri = context.getContentResolver().insert(Notes.CONTENT_DATA_URI,
                             mTextDataValues);
+                    // 插入数据
                     try {
                         setTextDataId(Long.valueOf(uri.getPathSegments().get(1)));
                     } catch (NumberFormatException e) {
@@ -203,6 +217,7 @@ public class Note {
                         return null;
                     }
                 } else {
+                    // 更新数据
                     builder = ContentProviderOperation.newUpdate(ContentUris.withAppendedId(
                             Notes.CONTENT_DATA_URI, mTextDataId));
                     builder.withValues(mTextDataValues);
@@ -233,6 +248,7 @@ public class Note {
                 mCallDataValues.clear();
             }
 
+            //返回便签数据
             if (operationList.size() > 0) {
                 try {
                     ContentProviderResult[] results = context.getContentResolver().applyBatch(
