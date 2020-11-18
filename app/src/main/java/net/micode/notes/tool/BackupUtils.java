@@ -41,6 +41,11 @@ public class BackupUtils {
     // Singleton stuff
     private static BackupUtils sInstance;
 
+    /**
+     * 返回一个BackupUtils的实例
+     * @param context
+     * @return
+     */
     public static synchronized BackupUtils getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new BackupUtils(context);
@@ -65,26 +70,49 @@ public class BackupUtils {
 
     private TextExport mTextExport;
 
+    /**
+     * 返回一个内部类
+     * @param context 上下文
+     */
     private BackupUtils(Context context) {
         mTextExport = new TextExport(context);
     }
 
+    /**
+     * 判断外部存储器是否可用
+     * @return
+     */
     private static boolean externalStorageAvailable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
+    /**
+     * 导出为文本
+     * @return
+     */
     public int exportToText() {
         return mTextExport.exportToText();
     }
 
+    /**
+     * 获得已导出文本的文件名
+     * @return
+     */
     public String getExportedTextFileName() {
         return mTextExport.mFileName;
     }
 
+    /**
+     * 获得已导出文本的文件夹
+     * @return
+     */
     public String getExportedTextFileDir() {
         return mTextExport.mFileDirectory;
     }
 
+    /**
+     * 导出的内部类
+     */
     private static class TextExport {
         private static final String[] NOTE_PROJECTION = {
                 NoteColumns.ID,
@@ -98,7 +126,7 @@ public class BackupUtils {
         private static final int NOTE_COLUMN_MODIFIED_DATE = 1;
 
         private static final int NOTE_COLUMN_SNIPPET = 2;
-
+        // 数据投影
         private static final String[] DATA_PROJECTION = {
                 DataColumns.CONTENT,
                 DataColumns.MIME_TYPE,
@@ -125,6 +153,10 @@ public class BackupUtils {
         private String mFileName;
         private String mFileDirectory;
 
+        /**
+         * 初始化函数
+         * @param context
+         */
         public TextExport(Context context) {
             TEXT_FORMAT = context.getResources().getStringArray(R.array.format_for_exported_note);
             mContext = context;
@@ -132,6 +164,11 @@ public class BackupUtils {
             mFileDirectory = "";
         }
 
+        /**
+         * 获得导出的格式
+         * @param id
+         * @return
+         */
         private String getFormat(int id) {
             return TEXT_FORMAT[id];
         }
