@@ -23,22 +23,22 @@ import net.micode.notes.R;
 import net.micode.notes.ui.NotesPreferenceActivity;
 
 public class ResourceParser {
-
+    // 定义颜色资源
     public static final int YELLOW           = 0;
     public static final int BLUE             = 1;
     public static final int WHITE            = 2;
     public static final int GREEN            = 3;
     public static final int RED              = 4;
-
+    // 默认背景颜色
     public static final int BG_DEFAULT_COLOR = YELLOW;
-
+    // 文字大小资源
     public static final int TEXT_SMALL       = 0;
     public static final int TEXT_MEDIUM      = 1;
     public static final int TEXT_LARGE       = 2;
     public static final int TEXT_SUPER       = 3;
-
+    // 默认文字大小资源
     public static final int BG_DEFAULT_FONT_SIZE = TEXT_MEDIUM;
-
+    // 将背景资源id和drawable中的资源对应起来
     public static class NoteBgResources {
         private final static int [] BG_EDIT_RESOURCES = new int [] {
             R.drawable.edit_yellow,
@@ -47,7 +47,7 @@ public class ResourceParser {
             R.drawable.edit_green,
             R.drawable.edit_red
         };
-
+        // 将标题资源id和drawable中的资源对应起来
         private final static int [] BG_EDIT_TITLE_RESOURCES = new int [] {
             R.drawable.edit_title_yellow,
             R.drawable.edit_title_blue,
@@ -56,15 +56,30 @@ public class ResourceParser {
             R.drawable.edit_title_red
         };
 
+        /**
+         * 根据id获取背景资源
+         * @param id
+         * @return
+         */
         public static int getNoteBgResource(int id) {
             return BG_EDIT_RESOURCES[id];
         }
 
+        /**
+         * 根据id获得标题资源
+         * @param id
+         * @return
+         */
         public static int getNoteTitleBgResource(int id) {
             return BG_EDIT_TITLE_RESOURCES[id];
         }
     }
 
+    /**
+     * 获得默认背景的id
+     * @param context
+     * @return
+     */
     public static int getDefaultBgId(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
                 NotesPreferenceActivity.PREFERENCE_SET_BG_COLOR_KEY, false)) {
@@ -74,6 +89,7 @@ public class ResourceParser {
         }
     }
 
+    //背景资源内部类
     public static class NoteItemBgResources {
         private final static int [] BG_FIRST_RESOURCES = new int [] {
             R.drawable.list_yellow_up,
@@ -127,7 +143,7 @@ public class ResourceParser {
             return R.drawable.list_folder;
         }
     }
-
+    // 桌面部件资源内部类
     public static class WidgetBgResources {
         private final static int [] BG_2X_RESOURCES = new int [] {
             R.drawable.widget_2x_yellow,
@@ -153,7 +169,7 @@ public class ResourceParser {
             return BG_4X_RESOURCES[id];
         }
     }
-
+    // 字体资源内部类
     public static class TextAppearanceResources {
         private final static int [] TEXTAPPEARANCE_RESOURCES = new int [] {
             R.style.TextAppearanceNormal,

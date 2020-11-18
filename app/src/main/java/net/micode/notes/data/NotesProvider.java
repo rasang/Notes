@@ -79,12 +79,25 @@ public class NotesProvider extends ContentProvider {
         + " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER
         + " AND " + NoteColumns.TYPE + "=" + Notes.TYPE_NOTE;
 
+    /**
+     * 获得数据库的实例对象
+     * @return
+     */
     @Override
     public boolean onCreate() {
         mHelper = NotesDatabaseHelper.getInstance(getContext());
         return true;
     }
 
+    /**
+     *  通过uri去获得需要的资源对象
+     * @param uri uri
+     * @param projection
+     * @param selection 条件筛选
+     * @param selectionArgs 条件筛选占位符需要的值
+     * @param sortOrder 排序方式
+     * @return
+     */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -147,6 +160,12 @@ public class NotesProvider extends ContentProvider {
         return c;
     }
 
+    /**
+     * 通过uri插入资源
+     * @param uri uri
+     * @param values 键值对 相当于map的存在
+     * @return
+     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
@@ -181,6 +200,13 @@ public class NotesProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, insertedId);
     }
 
+    /**
+     * 通过uri删除资源
+     * @param uri uri
+     * @param selection 筛选条件
+     * @param selectionArgs 筛选参数
+     * @return
+     */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
@@ -227,6 +253,14 @@ public class NotesProvider extends ContentProvider {
         return count;
     }
 
+    /**
+     * 通过uri更新资源
+     * @param uri uri
+     * @param values 键值对，要更新的值
+     * @param selection 条件筛选
+     * @param selectionArgs 条件筛选参数
+     * @return
+     */
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int count = 0;
@@ -267,10 +301,21 @@ public class NotesProvider extends ContentProvider {
         return count;
     }
 
+    /**
+     * 筛选条件的格式化函数s
+     * @param selection 筛选条件
+     * @return
+     */
     private String parseSelection(String selection) {
         return (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : "");
     }
 
+    /**
+     * 便签的版本升级
+     * @param id 列id
+     * @param selection 筛选条件
+     * @param selectionArgs 筛选条件参数
+     */
     private void increaseNoteVersion(long id, String selection, String[] selectionArgs) {
         StringBuilder sql = new StringBuilder(120);
         sql.append("UPDATE ");

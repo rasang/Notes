@@ -32,11 +32,14 @@ import net.micode.notes.tool.ResourceParser;
 import net.micode.notes.ui.NoteEditActivity;
 import net.micode.notes.ui.NotesListActivity;
 
+/**
+ * AppWidgetProvider是android中提供的用于实现桌面小工具的类，其本质是一个广播
+ */
 public abstract class NoteWidgetProvider extends AppWidgetProvider {
     public static final String [] PROJECTION = new String [] {
-        NoteColumns.ID,
-        NoteColumns.BG_COLOR_ID,
-        NoteColumns.SNIPPET
+            NoteColumns.ID,
+            NoteColumns.BG_COLOR_ID,
+            NoteColumns.SNIPPET
     };
 
     public static final int COLUMN_ID           = 0;
@@ -45,6 +48,11 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = "NoteWidgetProvider";
 
+    /**
+     *App Widget 从App Widget host 中删除的时候调用。
+     * @param context
+     * @param appWidgetIds
+     */
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         ContentValues values = new ContentValues();
@@ -56,6 +64,16 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
                     new String[] { String.valueOf(appWidgetIds[i])});
         }
     }
+
+    /**
+     * ContentResolver直译为内容解析器，Android中程序间数据的共享是通过Provider/Resolver进行的。提供数据（内容）的就叫Provider，Resovler提供接口对这个内容进行解读。
+     * 第一个参数，uri，rui是什么呢？好吧，上面我们提到了Android提供内容的叫Provider，那么在Android中怎么区分各个Provider？
+     * 有提供联系人的，有提供图片的等等。所以就需要有一个唯一的标识来标识这个Provider，Uri就是这个标识，android.provider.ContactsContract.Contacts.CONTENT_URI就是提供联系人的内容提供者。
+     * 第二个参数，projection，这个参数告诉Provider要返回的内容（列Column）
+     * @param context
+     * @param widgetId
+     * @return
+     */
 
     private Cursor getNoteWidgetInfo(Context context, int widgetId) {
         return context.getContentResolver().query(Notes.CONTENT_NOTE_URI,
@@ -69,8 +87,18 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
         update(context, appWidgetManager, appWidgetIds, false);
     }
 
+    /**
+     *  间隔调用此方法去更新App Widget，间隔时间的设置是在AppWidgetProviderInfo下的updatePeriodMillis属性，
+     *  同样当用户添加App Widget的时候也被调用。
+     *  如果你已经声明了一个configuration Activity，
+     *  用户添加App Widget的时候就不会调用onUpdate，但是在随后的更新中依然会被调用。
+     * @param context
+     * @param appWidgetManager
+     * @param appWidgetIds
+     * @param privacyMode
+     */
     private void update(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds,
-            boolean privacyMode) {
+                        boolean privacyMode) {
         for (int i = 0; i < appWidgetIds.length; i++) {
             if (appWidgetIds[i] != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 int bgId = ResourceParser.getDefaultBgId(context);
