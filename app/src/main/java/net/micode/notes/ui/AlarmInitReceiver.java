@@ -27,7 +27,9 @@ import android.database.Cursor;
 import net.micode.notes.data.Notes;
 import net.micode.notes.data.Notes.NoteColumns;
 
-
+/*
+* 初始化警告接收者
+* */
 public class AlarmInitReceiver extends BroadcastReceiver {
 
     private static final String [] PROJECTION = new String [] {
