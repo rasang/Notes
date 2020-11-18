@@ -29,7 +29,9 @@ import net.micode.notes.data.Notes;
 import net.micode.notes.tool.DataUtils;
 import net.micode.notes.tool.ResourceParser.NoteItemBgResources;
 
-
+/**
+ * 便签列表项
+ */
 public class NotesListItem extends LinearLayout {
     private ImageView mAlert;
     private TextView mTitle;
@@ -40,6 +42,7 @@ public class NotesListItem extends LinearLayout {
 
     public NotesListItem(Context context) {
         super(context);
+        //inflate()前只是获得控件，但没有大小没有在View里占据空间，inflate()后有一定大小，只是出于隐藏状态
         inflate(context, R.layout.note_item, this);
         mAlert = (ImageView) findViewById(R.id.iv_alert_icon);
         mTitle = (TextView) findViewById(R.id.tv_title);
@@ -48,14 +51,24 @@ public class NotesListItem extends LinearLayout {
         mCheckBox = (CheckBox) findViewById(android.R.id.checkbox);
     }
 
+    /**
+     * 为不同的情况绑定不同的效果
+     * @param context
+     * @param data
+     * @param choiceMode
+     * @param checked
+     */
     public void bind(Context context, NoteItemData data, boolean choiceMode, boolean checked) {
+        //如果被选中并且是便签类型就设复选框为可见，并且选中
+        //否则进行隐藏
         if (choiceMode && data.getType() == Notes.TYPE_NOTE) {
             mCheckBox.setVisibility(View.VISIBLE);
             mCheckBox.setChecked(checked);
         } else {
             mCheckBox.setVisibility(View.GONE);
         }
-
+        //如果是便签并且数据类型是电话号码
+        //设置弹窗为可见
         mItemData = data;
         if (data.getId() == Notes.ID_CALL_RECORD_FOLDER) {
             mCallName.setVisibility(View.GONE);
@@ -64,11 +77,13 @@ public class NotesListItem extends LinearLayout {
             mTitle.setText(context.getString(R.string.call_record_folder_name)
                     + context.getString(R.string.format_folder_files_count, data.getNotesCount()));
             mAlert.setImageResource(R.drawable.call_record);
-        } else if (data.getParentId() == Notes.ID_CALL_RECORD_FOLDER) {
+        } //如果是父id是电话号码
+        else if (data.getParentId() == Notes.ID_CALL_RECORD_FOLDER) {
             mCallName.setVisibility(View.VISIBLE);
             mCallName.setText(data.getCallName());
             mTitle.setTextAppearance(context,R.style.TextAppearanceSecondaryItem);
             mTitle.setText(DataUtils.getFormattedSnippet(data.getSnippet()));
+            //如果有设置提醒，就设置一个图标，并且设为可见
             if (data.hasAlert()) {
                 mAlert.setImageResource(R.drawable.clock);
                 mAlert.setVisibility(View.VISIBLE);
@@ -78,7 +93,7 @@ public class NotesListItem extends LinearLayout {
         } else {
             mCallName.setVisibility(View.GONE);
             mTitle.setTextAppearance(context, R.style.TextAppearancePrimaryItem);
-
+            //如果数据类型是文件夹
             if (data.getType() == Notes.TYPE_FOLDER) {
                 mTitle.setText(data.getSnippet()
                         + context.getString(R.string.format_folder_files_count,

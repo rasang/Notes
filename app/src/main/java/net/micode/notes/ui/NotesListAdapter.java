@@ -30,7 +30,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-
+/**
+ * CursorAdapter为Cursor和ListView连接提供了桥梁
+ */
 public class NotesListAdapter extends CursorAdapter {
     private static final String TAG = "NotesListAdapter";
     private Context mContext;
@@ -38,11 +40,19 @@ public class NotesListAdapter extends CursorAdapter {
     private int mNotesCount;
     private boolean mChoiceMode;
 
+    /**
+     * NotesListAdapter的内部类--app小部件的属性类
+     * 有小部件的id和小部件的类型
+     */
     public static class AppWidgetAttribute {
         public int widgetId;
         public int widgetType;
     };
 
+    /**
+     * 构造函数
+     * @param context
+     */
     public NotesListAdapter(Context context) {
         super(context, null);
         mSelectedIndex = new HashMap<Integer, Boolean>();
@@ -50,11 +60,25 @@ public class NotesListAdapter extends CursorAdapter {
         mNotesCount = 0;
     }
 
+    /**
+     * 创建新的便签列表项
+     * @param context
+     * @param cursor
+     * @param parent
+     * @return
+     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new NotesListItem(context);
     }
 
+    /**
+     * 根据上下文和光标得到便签项数据
+     * 并且根据数据绑定一个视图
+     * @param view
+     * @param context
+     * @param cursor
+     */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof NotesListItem) {
@@ -64,6 +88,11 @@ public class NotesListAdapter extends CursorAdapter {
         }
     }
 
+    /**
+     * 将被选中的项的下标存进mSelectedIndex中
+     * @param position
+     * @param checked
+     */
     public void setCheckedItem(final int position, final boolean checked) {
         mSelectedIndex.put(position, checked);
         notifyDataSetChanged();
@@ -73,11 +102,19 @@ public class NotesListAdapter extends CursorAdapter {
         return mChoiceMode;
     }
 
+    /**
+     * 设置选择模式
+     * @param mode
+     */
     public void setChoiceMode(boolean mode) {
         mSelectedIndex.clear();
         mChoiceMode = mode;
     }
 
+    /**
+     * 全选
+     * @param checked
+     */
     public void selectAll(boolean checked) {
         Cursor cursor = getCursor();
         for (int i = 0; i < getCount(); i++) {
@@ -89,6 +126,10 @@ public class NotesListAdapter extends CursorAdapter {
         }
     }
 
+    /**
+     * 获取被选择的项的id，放进itemSet里面
+     * @return
+     */
     public HashSet<Long> getSelectedItemIds() {
         HashSet<Long> itemSet = new HashSet<Long>();
         for (Integer position : mSelectedIndex.keySet()) {
@@ -101,10 +142,13 @@ public class NotesListAdapter extends CursorAdapter {
                 }
             }
         }
-
         return itemSet;
     }
 
+    /**
+     * 获取被选择的小部件，存进itemSet里面
+     * @return
+     */
     public HashSet<AppWidgetAttribute> getSelectedWidget() {
         HashSet<AppWidgetAttribute> itemSet = new HashSet<AppWidgetAttribute>();
         for (Integer position : mSelectedIndex.keySet()) {
@@ -128,6 +172,10 @@ public class NotesListAdapter extends CursorAdapter {
         return itemSet;
     }
 
+    /**
+     * 返回选中的个数
+     * @return
+     */
     public int getSelectedCount() {
         Collection<Boolean> values = mSelectedIndex.values();
         if (null == values) {
@@ -143,11 +191,20 @@ public class NotesListAdapter extends CursorAdapter {
         return count;
     }
 
+    /**
+     * 判断是否全部选中
+     * @return
+     */
     public boolean isAllSelected() {
         int checkedCount = getSelectedCount();
         return (checkedCount != 0 && checkedCount == mNotesCount);
     }
 
+    /**
+     * 返回是否是一个被选中的项
+     * @param position
+     * @return
+     */
     public boolean isSelectedItem(final int position) {
         if (null == mSelectedIndex.get(position)) {
             return false;
@@ -155,23 +212,34 @@ public class NotesListAdapter extends CursorAdapter {
         return mSelectedIndex.get(position);
     }
 
+    /**
+     * 当文本发生变化，计算总数
+     */
     @Override
     protected void onContentChanged() {
         super.onContentChanged();
         calcNotesCount();
     }
 
+    /**
+     * 当光标发生变化，计算总数
+     * @param cursor
+     */
     @Override
     public void changeCursor(Cursor cursor) {
         super.changeCursor(cursor);
         calcNotesCount();
     }
 
+    /**
+     * 计算note的总数目
+     */
     private void calcNotesCount() {
         mNotesCount = 0;
         for (int i = 0; i < getCount(); i++) {
             Cursor c = (Cursor) getItem(i);
             if (c != null) {
+                //判断类型是否是便签类型
                 if (NoteItemData.getNoteType(c) == Notes.TYPE_NOTE) {
                     mNotesCount++;
                 }
