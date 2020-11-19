@@ -114,14 +114,21 @@ public class NotesListItem extends LinearLayout {
         setBackground(data);
     }
 
+    /**
+     * 设置背景
+     * @param data
+     */
     private void setBackground(NoteItemData data) {
         int id = data.getBgColorId();
         if (data.getType() == Notes.TYPE_NOTE) {
+            //判断是否是单一便签或者是单一文件夹
             if (data.isSingle() || data.isOneFollowingFolder()) {
-                setBackgroundResource(NoteItemBgResources.getNoteBgSingleRes(id));
-            } else if (data.isLast()) {
+                setBackgroundResource(NoteItemBgResources.getNoteBgSingleRes(id));//根据传入的id设置颜色
+            } //判断数据是否是最后一个
+            else if (data.isLast()) {
                 setBackgroundResource(NoteItemBgResources.getNoteBgLastRes(id));
-            } else if (data.isFirst() || data.isMultiFollowingFolder()) {
+            } //判断数据是否是第一个或者是文件夹里面的多个
+            else if (data.isFirst() || data.isMultiFollowingFolder()) {
                 setBackgroundResource(NoteItemBgResources.getNoteBgFirstRes(id));
             } else {
                 setBackgroundResource(NoteItemBgResources.getNoteBgNormalRes(id));
