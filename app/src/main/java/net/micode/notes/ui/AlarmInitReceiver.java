@@ -27,9 +27,9 @@ import android.database.Cursor;
 import net.micode.notes.data.Notes;
 import net.micode.notes.data.Notes.NoteColumns;
 
-/*
+/**
 * 初始化警告接收者
-* */
+*/
 public class AlarmInitReceiver extends BroadcastReceiver {
 
     private static final String [] PROJECTION = new String [] {
@@ -42,7 +42,9 @@ public class AlarmInitReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        //现在的时间
         long currentDate = System.currentTimeMillis();
+        //连接数据库查找便签
         Cursor c = context.getContentResolver().query(Notes.CONTENT_NOTE_URI,
                 PROJECTION,
                 NoteColumns.ALERTED_DATE + ">? AND " + NoteColumns.TYPE + "=" + Notes.TYPE_NOTE,
@@ -51,11 +53,16 @@ public class AlarmInitReceiver extends BroadcastReceiver {
 
         if (c != null) {
             if (c.moveToFirst()) {
+                //循环查找符合对应时间的便签
                 do {
                     long alertDate = c.getLong(COLUMN_ALERTED_DATE);
+                    //创建一个intent通信
                     Intent sender = new Intent(context, AlarmReceiver.class);
+                    //通过URI获取相应的资源
                     sender.setData(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, c.getLong(COLUMN_ID)));
+                    //定时广播，闹钟提醒
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, sender, 0);
+                    //获取系统服务
                     AlarmManager alermManager = (AlarmManager) context
                             .getSystemService(Context.ALARM_SERVICE);
                     alermManager.set(AlarmManager.RTC_WAKEUP, alertDate, pendingIntent);
