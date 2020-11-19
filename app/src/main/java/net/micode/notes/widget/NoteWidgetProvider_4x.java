@@ -23,8 +23,13 @@ import net.micode.notes.R;
 import net.micode.notes.data.Notes;
 import net.micode.notes.tool.ResourceParser;
 
-
+/**
+ * 组件widget_4x.xml文件内容的布局化，
+ */
 public class NoteWidgetProvider_4x extends NoteWidgetProvider {
+    /**
+     * 每次窗口小部件被点击更新都调用一次
+     */
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.update(context, appWidgetManager, appWidgetIds);
