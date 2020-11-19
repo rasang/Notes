@@ -28,14 +28,18 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
-
+/*
+* 日期时间选择器会话，继承自对话框，点击监听器接口
+* */
 public class DateTimePickerDialog extends AlertDialog implements OnClickListener {
 
-    private Calendar mDate = Calendar.getInstance();
+    private Calendar mDate = Calendar.getInstance();//获取指定时间点
     private boolean mIs24HourView;
-    private OnDateTimeSetListener mOnDateTimeSetListener;
-    private DateTimePicker mDateTimePicker;
-
+    private OnDateTimeSetListener mOnDateTimeSetListener;//日期时间设置监听器
+    private DateTimePicker mDateTimePicker;//日期时间选择器
+    /*
+    * 日期时间设置监听器
+    * */
     public interface OnDateTimeSetListener {
         void OnDateTimeSet(AlertDialog dialog, long date);
     }
