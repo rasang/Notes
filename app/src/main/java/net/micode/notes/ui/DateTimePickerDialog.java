@@ -43,7 +43,9 @@ public class DateTimePickerDialog extends AlertDialog implements OnClickListener
     public interface OnDateTimeSetListener {
         void OnDateTimeSet(AlertDialog dialog, long date);
     }
-
+    /*
+    * 日期时间选择器会话的构造函数
+    * */
     public DateTimePickerDialog(Context context, long date) {
         super(context);
         mDateTimePicker = new DateTimePicker(context);
@@ -67,15 +69,21 @@ public class DateTimePickerDialog extends AlertDialog implements OnClickListener
         set24HourView(DateFormat.is24HourFormat(this.getContext()));
         updateTitle(mDate.getTimeInMillis());
     }
-
+    /*
+    * 设置24小时视图
+    * */
     public void set24HourView(boolean is24HourView) {
         mIs24HourView = is24HourView;
     }
-
+    /*
+    * 设置日期时间设置监听器
+    * */
     public void setOnDateTimeSetListener(OnDateTimeSetListener callBack) {
         mOnDateTimeSetListener = callBack;
     }
-
+    /*
+    * 更新标题
+    * */
     private void updateTitle(long date) {
         int flag =
             DateUtils.FORMAT_SHOW_YEAR |
@@ -84,7 +92,9 @@ public class DateTimePickerDialog extends AlertDialog implements OnClickListener
         flag |= mIs24HourView ? DateUtils.FORMAT_24HOUR : DateUtils.FORMAT_24HOUR;
         setTitle(DateUtils.formatDateTime(this.getContext(), date, flag));
     }
-
+    /*
+    * 当日期时间设置监听器不为空的时候，将以毫秒为单位的时间存入监听器
+    * */
     public void onClick(DialogInterface arg0, int arg1) {
         if (mOnDateTimeSetListener != null) {
             mOnDateTimeSetListener.OnDateTimeSet(this, mDate.getTimeInMillis());
