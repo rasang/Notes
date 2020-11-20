@@ -131,9 +131,7 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
                 RemoteViews rv = new RemoteViews(context.getPackageName(), getLayoutId());
                 rv.setImageViewResource(R.id.widget_bg_image, getBgResourceId(bgId));
                 intent.putExtra(Notes.INTENT_EXTRA_BACKGROUND_ID, bgId);
-                /**
-                 * Generate the pending intent to start host for the widget
-                 */
+               
                 PendingIntent pendingIntent = null;
                 if (privacyMode) {
                     rv.setTextViewText(R.id.widget_text,
