@@ -127,7 +127,10 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
                 if (c != null) {
                     c.close();
                 }
-
+                    /**
+                     *  这是一个可以跨进程显示view的类，显示的view是从布局文件inflate出来，
+                     *  且该类提供了一些基本的方法来修改这个view的内容。
+                     */
                 RemoteViews rv = new RemoteViews(context.getPackageName(), getLayoutId());
                 rv.setImageViewResource(R.id.widget_bg_image, getBgResourceId(bgId));
                 intent.putExtra(Notes.INTENT_EXTRA_BACKGROUND_ID, bgId);
