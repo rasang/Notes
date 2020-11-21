@@ -23,8 +23,13 @@ import net.micode.notes.R;
 import net.micode.notes.data.Notes;
 import net.micode.notes.tool.ResourceParser;
 
-
+/**
+ * 组件widget_2x.xml文件内容的布局化
+ */
 public class NoteWidgetProvider_2x extends NoteWidgetProvider {
+    /**
+     * 每次窗口小部件被点击更新都调用一次
+     */
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.update(context, appWidgetManager, appWidgetIds);
@@ -35,6 +40,11 @@ public class NoteWidgetProvider_2x extends NoteWidgetProvider {
         return R.layout.widget_2x;
     }
 
+    /**
+     * 资源调用访问
+     * @param bgId
+     * @return
+     */
     @Override
     protected int getBgResourceId(int bgId) {
         return ResourceParser.WidgetBgResources.getWidget2xBgResource(bgId);
