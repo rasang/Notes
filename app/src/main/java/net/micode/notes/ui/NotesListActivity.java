@@ -139,6 +139,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_list);
+        // 初始化资源
         initResources();
 
         /**
@@ -147,6 +148,12 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         setAppInfoFromRawRes();
     }
 
+    /**
+     * 根据上一个activity的requestsCode来判断上一个打开的是什么应用，要做什么操作
+     * @param requestCode 请求码
+     * @param resultCode 结果码
+     * @param data 数据
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK
@@ -157,6 +164,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
     }
 
+    /**
+     * 加载介绍文件
+     */
     private void setAppInfoFromRawRes() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (!sp.getBoolean(PREFERENCE_ADD_INTRODUCTION, false)) {
@@ -209,6 +219,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         startAsyncNotesListQuery();
     }
 
+    /**
+     * 初始化资源
+     */
     private void initResources() {
         mContentResolver = this.getContentResolver();
         mBackgroundQueryHandler = new BackgroundQueryHandler(this.getContentResolver());
@@ -231,25 +244,36 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         mModeCallBack = new ModeCallback();
     }
 
+    /**
+     * 一个监听器，包括多选模式的监听和菜单按钮的监听
+     */
     private class ModeCallback implements ListView.MultiChoiceModeListener, OnMenuItemClickListener {
         private DropdownMenu mDropDownMenu;
         private ActionMode mActionMode;
         private MenuItem mMoveMenu;
 
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // 实例化菜单布局
             getMenuInflater().inflate(R.menu.note_list_options, menu);
+            // 设置删除按钮的监听器
             menu.findItem(R.id.delete).setOnMenuItemClickListener(this);
             mMoveMenu = menu.findItem(R.id.move);
+            // 如果父文件夹id是通话记录文件夹或者用户没有文件夹 就隐藏菜单(这个功能在最新的api中没有效果，菜单会依旧存在)
             if (mFocusNoteDataItem.getParentId() == Notes.ID_CALL_RECORD_FOLDER
                     || DataUtils.getUserFolderCount(mContentResolver) == 0) {
                 mMoveMenu.setVisible(false);
             } else {
+                // 其他情况设置菜单可见
                 mMoveMenu.setVisible(true);
+                // 设置菜单按钮监听器
                 mMoveMenu.setOnMenuItemClickListener(this);
             }
             mActionMode = mode;
+            // 设置选择模式
             mNotesListAdapter.setChoiceMode(true);
+            // 设置不可长按
             mNotesListView.setLongClickable(false);
+            // 设置新建便签不可见
             mAddNewNote.setVisibility(View.GONE);
 
             View customView = LayoutInflater.from(NotesListActivity.this).inflate(
@@ -259,6 +283,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     (Button) customView.findViewById(R.id.selection_menu),
                     R.menu.note_list_dropdown);
             mDropDownMenu.setOnDropdownMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
+                // 全选的功能，但是似乎我并没有发现他实际的实现
                 public boolean onMenuItemClick(MenuItem item) {
                     mNotesListAdapter.selectAll(!mNotesListAdapter.isAllSelected());
                     updateMenu();
@@ -269,6 +294,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             return true;
         }
 
+        /**
+         * 更新menu
+         */
         private void updateMenu() {
             int selectedCount = mNotesListAdapter.getSelectedCount();
             // Update dropdown menu
@@ -297,22 +325,26 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
 
         public void onDestroyActionMode(ActionMode mode) {
+            // 关闭选择模式
             mNotesListAdapter.setChoiceMode(false);
+            // 允许长按
             mNotesListView.setLongClickable(true);
+            // 设置新建便签按钮可见
             mAddNewNote.setVisibility(View.VISIBLE);
         }
 
         public void finishActionMode() {
             mActionMode.finish();
         }
-
+        // 选择切换监听器
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                 boolean checked) {
             mNotesListAdapter.setCheckedItem(position, checked);
             updateMenu();
         }
-
+        // 菜单点击事件
         public boolean onMenuItemClick(MenuItem item) {
+            // 没有选中便签
             if (mNotesListAdapter.getSelectedCount() == 0) {
                 Toast.makeText(NotesListActivity.this, getString(R.string.menu_select_none),
                         Toast.LENGTH_SHORT).show();
@@ -320,6 +352,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             }
 
             switch (item.getItemId()) {
+                // 删除按钮
                 case R.id.delete:
                     AlertDialog.Builder builder = new AlertDialog.Builder(NotesListActivity.this);
                     builder.setTitle(getString(R.string.alert_title_delete));
@@ -336,6 +369,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     builder.setNegativeButton(android.R.string.cancel, null);
                     builder.show();
                     break;
+                // 移动按钮
                 case R.id.move:
                     startQueryDestinationFolders();
                     break;
@@ -345,11 +379,12 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             return true;
         }
     }
-
+    // 新建按钮监听器
     private class NewNoteOnTouchListener implements OnTouchListener {
 
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
+                // 按下的动作
                 case MotionEvent.ACTION_DOWN: {
                     Display display = getWindowManager().getDefaultDisplay();
                     int screenHeight = display.getHeight();
@@ -386,6 +421,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     }
                     break;
                 }
+                // 按下移动的动作
                 case MotionEvent.ACTION_MOVE: {
                     if (mDispatch) {
                         mDispatchY += (int) event.getY() - mOriginY;
@@ -394,6 +430,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     }
                     break;
                 }
+                // 其他动作
                 default: {
                     if (mDispatch) {
                         event.setLocation(event.getX(), mDispatchY);
@@ -407,7 +444,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
 
     };
-
+    // 启动异步的便签查询
     private void startAsyncNotesListQuery() {
         String selection = (mCurrentFolderId == Notes.ID_ROOT_FOLDER) ? ROOT_FOLDER_SELECTION
                 : NORMAL_SELECTION;
@@ -417,11 +454,20 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                 }, NoteColumns.TYPE + " DESC," + NoteColumns.MODIFIED_DATE + " DESC");
     }
 
+    /**
+     * 用来异步查询数据库的类
+     */
     private final class BackgroundQueryHandler extends AsyncQueryHandler {
         public BackgroundQueryHandler(ContentResolver contentResolver) {
             super(contentResolver);
         }
 
+        /**
+         * 在查询完成时要做的操作
+         * @param token
+         * @param cookie
+         * @param cursor 数据游标
+         */
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
             switch (token) {
@@ -440,13 +486,13 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             }
         }
     }
-
+    // 弹出移动便签选择文件夹的弹窗
     private void showFolderListMenu(Cursor cursor) {
         AlertDialog.Builder builder = new AlertDialog.Builder(NotesListActivity.this);
         builder.setTitle(R.string.menu_title_select_folder);
         final FoldersListAdapter adapter = new FoldersListAdapter(this, cursor);
         builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-
+            // 根据用户选择移动到文件夹
             public void onClick(DialogInterface dialog, int which) {
                 DataUtils.batchMoveToFolder(mContentResolver,
                         mNotesListAdapter.getSelectedItemIds(), adapter.getItemId(which));
@@ -461,15 +507,16 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         });
         builder.show();
     }
-
+    // 新建便签
     private void createNewNote() {
         Intent intent = new Intent(this, NoteEditActivity.class);
         intent.setAction(Intent.ACTION_INSERT_OR_EDIT);
         intent.putExtra(Notes.INTENT_EXTRA_FOLDER_ID, mCurrentFolderId);
         this.startActivityForResult(intent, REQUEST_CODE_NEW_NODE);
     }
-
+    // 批量删除
     private void batchDelete() {
+        // 新建异步任务执行删除
         new AsyncTask<Void, Void, HashSet<AppWidgetAttribute>>() {
             protected HashSet<AppWidgetAttribute> doInBackground(Void... unused) {
                 HashSet<AppWidgetAttribute> widgets = mNotesListAdapter.getSelectedWidget();
@@ -505,7 +552,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             }
         }.execute();
     }
-
+    // 删除文件夹
     private void deleteFolder(long folderId) {
         if (folderId == Notes.ID_ROOT_FOLDER) {
             Log.e(TAG, "Wrong folder id, should not happen " + folderId);
@@ -532,16 +579,17 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             }
         }
     }
-
+    // 打开便签，这里应该是笔误
     private void openNode(NoteItemData data) {
         Intent intent = new Intent(this, NoteEditActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.putExtra(Intent.EXTRA_UID, data.getId());
         this.startActivityForResult(intent, REQUEST_CODE_OPEN_NODE);
     }
-
+    // 打开文件夹
     private void openFolder(NoteItemData data) {
         mCurrentFolderId = data.getId();
+        // 启动异步的便签列表查询
         startAsyncNotesListQuery();
         if (data.getId() == Notes.ID_CALL_RECORD_FOLDER) {
             mState = ListEditState.CALL_RECORD_FOLDER;
@@ -557,6 +605,10 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         mTitleBar.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * 监听点击事件，然后分别进行处理
+     * @param v
+     */
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_new_note:
@@ -567,6 +619,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
     }
 
+    /**
+     * 显示软键盘
+     */
     private void showSoftInput() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
@@ -574,11 +629,19 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
     }
 
+    /**
+     * 显示软键盘
+     * @param view
+     */
     private void hideSoftInput(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /**
+     * 新建文件夹或更改文件夹名
+     * @param create
+     */
     private void showCreateOrModifyFolderDialog(final boolean create) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_text, null);
@@ -598,6 +661,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
 
         builder.setPositiveButton(android.R.string.ok, null);
+        // 设置取消按钮点击事件
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 hideSoftInput(etName);
@@ -606,16 +670,19 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
 
         final Dialog dialog = builder.setView(view).show();
         final Button positive = (Button)dialog.findViewById(android.R.id.button1);
+        // 设置确定按钮点击事件
         positive.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 hideSoftInput(etName);
                 String name = etName.getText().toString();
+                // 检查文件名是否存在
                 if (DataUtils.checkVisibleFolderName(mContentResolver, name)) {
                     Toast.makeText(NotesListActivity.this, getString(R.string.folder_exist, name),
                             Toast.LENGTH_LONG).show();
                     etName.setSelection(0, etName.length());
                     return;
                 }
+                // 修改文件夹名
                 if (!create) {
                     if (!TextUtils.isEmpty(name)) {
                         ContentValues values = new ContentValues();
@@ -628,6 +695,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                         });
                     }
                 } else if (!TextUtils.isEmpty(name)) {
+                    // 新建文件夹
                     ContentValues values = new ContentValues();
                     values.put(NoteColumns.SNIPPET, name);
                     values.put(NoteColumns.TYPE, Notes.TYPE_FOLDER);
@@ -636,7 +704,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                 dialog.dismiss();
             }
         });
-
+        // 内容为空，设置按钮不可点击
         if (TextUtils.isEmpty(etName.getText())) {
             positive.setEnabled(false);
         }
@@ -664,6 +732,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         });
     }
 
+    /**
+     * 当按下返回键
+     */
     @Override
     public void onBackPressed() {
         switch (mState) {
@@ -688,6 +759,11 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
     }
 
+    /**
+     * 更新小部件
+     * @param appWidgetId 小部件id
+     * @param appWidgetType 小部件类型
+     */
     private void updateWidget(int appWidgetId, int appWidgetType) {
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         if (appWidgetType == Notes.TYPE_WIDGET_2X) {
@@ -707,6 +783,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         setResult(RESULT_OK, intent);
     }
 
+    /**
+     * 长按文件夹会弹出的菜单
+     */
     private final OnCreateContextMenuListener mFolderOnCreateContextMenuListener = new OnCreateContextMenuListener() {
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
             if (mFocusNoteDataItem != null) {
@@ -718,6 +797,10 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
     };
 
+    /**
+     * 长按文件的菜单关闭
+     * @param menu
+     */
     @Override
     public void onContextMenuClosed(Menu menu) {
         if (mNotesListView != null) {
@@ -726,6 +809,11 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         super.onContextMenuClosed(menu);
     }
 
+    /**
+     * 菜单点击事件
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (mFocusNoteDataItem == null) {
@@ -760,6 +848,11 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         return true;
     }
 
+    /**
+     * 根据当前所处的位置，设置菜单类型
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
@@ -778,6 +871,11 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         return true;
     }
 
+    /**
+     * 对菜单点击事件进行处理
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -818,21 +916,36 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         return true;
     }
 
+    /**
+     * 启动搜索UI
+     * @return
+     */
     @Override
     public boolean onSearchRequested() {
         startSearch(null, false, null /* appData */, false);
         return true;
     }
 
+    /**
+     * 将文本导出为文件
+     */
     private void exportNoteToText() {
         final BackupUtils backup = BackupUtils.getInstance(NotesListActivity.this);
         new AsyncTask<Void, Void, Integer>() {
-
+            /**
+             * 在后台处理
+             * @param unused
+             * @return
+             */
             @Override
             protected Integer doInBackground(Void... unused) {
                 return backup.exportToText();
             }
 
+            /**
+             * 处理导出事件
+             * @param result
+             */
             @Override
             protected void onPostExecute(Integer result) {
                 if (result == BackupUtils.STATE_SD_CARD_UNMOUONTED) {
@@ -866,16 +979,26 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }.execute();
     }
 
+    /**
+     * 判断是否处于异步模式
+     * @return
+     */
     private boolean isSyncMode() {
         return NotesPreferenceActivity.getSyncAccountName(this).trim().length() > 0;
     }
 
+    /**
+     * 打开偏好设置的activity
+     */
     private void startPreferenceActivity() {
         Activity from = getParent() != null ? getParent() : this;
         Intent intent = new Intent(from, NotesPreferenceActivity.class);
         from.startActivityIfNeeded(intent, -1);
     }
 
+    /**
+     * 列表监听器
+     */
     private class OnListItemClickListener implements OnItemClickListener {
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -917,6 +1040,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
 
     }
 
+    /**
+     * 启动查询目标文件夹
+     */
     private void startQueryDestinationFolders() {
         String selection = NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>? AND " + NoteColumns.ID + "<>?";
         selection = (mState == ListEditState.NOTE_LIST) ? selection:
@@ -935,6 +1061,14 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                 NoteColumns.MODIFIED_DATE + " DESC");
     }
 
+    /**
+     * 长按开启编辑模式
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     * @return
+     */
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (view instanceof NotesListItem) {
             mFocusNoteDataItem = ((NotesListItem) view).getItemData();

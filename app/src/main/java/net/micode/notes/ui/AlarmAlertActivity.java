@@ -92,7 +92,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
         return pm.isScreenOn();
     }
     /*
-    * 播放警告音乐
+    * 播放闹钟
     * */
     private void playAlarmSound() {
         Uri url = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
@@ -163,7 +163,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
         finish();
     }
     /*
-    * 关闭警告提示音
+    * 关闭闹钟
     * */
     private void stopAlarmSound() {
         if (mPlayer != null) {
