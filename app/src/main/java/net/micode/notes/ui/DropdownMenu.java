@@ -27,11 +27,15 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 import net.micode.notes.R;
 
+/**
+ * 下拉菜单
+ */
 public class DropdownMenu {
     private Button mButton;
     private PopupMenu mPopupMenu;
     private Menu mMenu;
 
+    //初始化下拉菜单
     public DropdownMenu(Context context, Button button, int menuId) {
         mButton = button;
         mButton.setBackgroundResource(R.drawable.dropdown_icon);
@@ -45,16 +49,19 @@ public class DropdownMenu {
         });
     }
 
+    //设置下拉菜单监听器
     public void setOnDropdownMenuItemClickListener(OnMenuItemClickListener listener) {
         if (mPopupMenu != null) {
             mPopupMenu.setOnMenuItemClickListener(listener);
         }
     }
 
+    //查找相应选项
     public MenuItem findItem(int id) {
         return mMenu.findItem(id);
     }
 
+    //设置标题
     public void setTitle(CharSequence title) {
         mButton.setText(title);
     }

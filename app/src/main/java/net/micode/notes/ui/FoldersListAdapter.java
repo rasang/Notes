@@ -28,7 +28,9 @@ import net.micode.notes.R;
 import net.micode.notes.data.Notes;
 import net.micode.notes.data.Notes.NoteColumns;
 
-
+/**
+ * 文件夹列表
+ */
 public class FoldersListAdapter extends CursorAdapter {
     public static final String [] PROJECTION = {
         NoteColumns.ID,
@@ -43,11 +45,13 @@ public class FoldersListAdapter extends CursorAdapter {
         // TODO Auto-generated constructor stub
     }
 
+    //创建一个新的文件夹列表视图
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new FolderListItem(context);
     }
 
+    //文件夹和文件夹名绑定视图
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof FolderListItem) {
@@ -57,12 +61,14 @@ public class FoldersListAdapter extends CursorAdapter {
         }
     }
 
+    //获取文件夹名
     public String getFolderName(Context context, int position) {
         Cursor cursor = (Cursor) getItem(position);
         return (cursor.getLong(ID_COLUMN) == Notes.ID_ROOT_FOLDER) ? context
                 .getString(R.string.menu_move_parent_folder) : cursor.getString(NAME_COLUMN);
     }
 
+    //将文件夹显示出来
     private class FolderListItem extends LinearLayout {
         private TextView mName;
 
