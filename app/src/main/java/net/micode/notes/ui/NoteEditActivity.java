@@ -349,6 +349,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         initActivityState(intent);
     }
 
+    /**
+     * 保存状态
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -496,6 +500,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
             mFontSizeId = sFontSizeBtnsMap.get(id);
             mSharedPrefs.edit().putInt(PREFERENCE_FONT_SIZE, mFontSizeId).commit();
             findViewById(sFontSelectorSelectionMap.get(mFontSizeId)).setVisibility(View.VISIBLE);
+            // 切换到清单模式
             if (mWorkingNote.getCheckListMode() == TextNote.MODE_CHECK_LIST) {
                 getWorkingText();
                 switchToListMode(mWorkingNote.getContent());
@@ -563,11 +568,13 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         } else {
             getMenuInflater().inflate(R.menu.note_edit, menu);
         }
+        // 对菜单的显示进行修改
         if (mWorkingNote.getCheckListMode() == TextNote.MODE_CHECK_LIST) {
             menu.findItem(R.id.menu_list_mode).setTitle(R.string.menu_normal_mode);
         } else {
             menu.findItem(R.id.menu_list_mode).setTitle(R.string.menu_list_mode);
         }
+        // 检测是否有闹钟
         if (mWorkingNote.hasClockAlert()) {
             menu.findItem(R.id.menu_alert).setVisible(false);
         } else {
@@ -584,10 +591,12 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // 新建便签
             case R.id.menu_new_note:
                 createNewNote();
                 break;
             case R.id.menu_delete:
+                // 删除
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.alert_title_delete));
                 builder.setIcon(android.R.drawable.ic_dialog_alert);
@@ -602,24 +611,30 @@ public class NoteEditActivity extends Activity implements OnClickListener,
                 builder.setNegativeButton(android.R.string.cancel, null);
                 builder.show();
                 break;
+                // 修改字体
             case R.id.menu_font_size:
                 mFontSizeSelector.setVisibility(View.VISIBLE);
                 findViewById(sFontSelectorSelectionMap.get(mFontSizeId)).setVisibility(View.VISIBLE);
                 break;
+                // 清单模式
             case R.id.menu_list_mode:
                 mWorkingNote.setCheckListMode(mWorkingNote.getCheckListMode() == 0 ?
                         TextNote.MODE_CHECK_LIST : 0);
                 break;
+                // 分享
             case R.id.menu_share:
                 getWorkingText();
                 sendTo(this, mWorkingNote.getContent());
                 break;
+                // 发送到桌面
             case R.id.menu_send_to_desktop:
                 sendToDesktop();
                 break;
+                // 设置提醒
             case R.id.menu_alert:
                 setReminder();
                 break;
+                // 删除提醒
             case R.id.menu_delete_remind:
                 mWorkingNote.setAlertDate(0, false);
                 break;
