@@ -95,6 +95,7 @@ public class NotesListItem extends LinearLayout {
             mTitle.setTextAppearance(context, R.style.TextAppearancePrimaryItem);
             //如果数据类型是文件夹
             if (data.getType() == Notes.TYPE_FOLDER) {
+                //显示文件名以及文件夹里面的便签数量
                 mTitle.setText(data.getSnippet()
                         + context.getString(R.string.format_folder_files_count,
                                 data.getNotesCount()));
@@ -109,8 +110,9 @@ public class NotesListItem extends LinearLayout {
                 }
             }
         }
+        //得到相对的时间字符串
         mTime.setText(DateUtils.getRelativeTimeSpanString(data.getModifiedDate()));
-
+        //根据data设置背景
         setBackground(data);
     }
 
