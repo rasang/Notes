@@ -32,19 +32,19 @@ public class DateTimePicker extends FrameLayout {
 
     private static final boolean DEFAULT_ENABLE_STATE = true;
 
-    private static final int HOURS_IN_HALF_DAY = 12;
-    private static final int HOURS_IN_ALL_DAY = 24;
-    private static final int DAYS_IN_ALL_WEEK = 7;
-    private static final int DATE_SPINNER_MIN_VAL = 0;
-    private static final int DATE_SPINNER_MAX_VAL = DAYS_IN_ALL_WEEK - 1;
-    private static final int HOUR_SPINNER_MIN_VAL_24_HOUR_VIEW = 0;
-    private static final int HOUR_SPINNER_MAX_VAL_24_HOUR_VIEW = 23;
-    private static final int HOUR_SPINNER_MIN_VAL_12_HOUR_VIEW = 1;
-    private static final int HOUR_SPINNER_MAX_VAL_12_HOUR_VIEW = 12;
-    private static final int MINUT_SPINNER_MIN_VAL = 0;
-    private static final int MINUT_SPINNER_MAX_VAL = 59;
-    private static final int AMPM_SPINNER_MIN_VAL = 0;
-    private static final int AMPM_SPINNER_MAX_VAL = 1;
+    private static final int HOURS_IN_HALF_DAY = 12;//12小时制的时间
+    private static final int HOURS_IN_ALL_DAY = 24;//24小时制的时间
+    private static final int DAYS_IN_ALL_WEEK = 7;//一周的天数
+    private static final int DATE_SPINNER_MIN_VAL = 0;//一周的第一天
+    private static final int DATE_SPINNER_MAX_VAL = DAYS_IN_ALL_WEEK - 1;//一周的最后一天
+    private static final int HOUR_SPINNER_MIN_VAL_24_HOUR_VIEW = 0;//24小时制的最小时间
+    private static final int HOUR_SPINNER_MAX_VAL_24_HOUR_VIEW = 23;//24小时制的最大时间
+    private static final int HOUR_SPINNER_MIN_VAL_12_HOUR_VIEW = 1;//12小时制的最小时间
+    private static final int HOUR_SPINNER_MAX_VAL_12_HOUR_VIEW = 12;//12小时制的最大时间
+    private static final int MINUT_SPINNER_MIN_VAL = 0;//一小时的最小分钟
+    private static final int MINUT_SPINNER_MAX_VAL = 59;//一小时的最大分钟
+    private static final int AMPM_SPINNER_MIN_VAL = 0;//AM
+    private static final int AMPM_SPINNER_MAX_VAL = 1;//PM
 
     private final NumberPicker mDateSpinner;
     private final NumberPicker mHourSpinner;
@@ -64,6 +64,7 @@ public class DateTimePicker extends FrameLayout {
 
     private OnDateTimeChangedListener mOnDateTimeChangedListener;
 
+    //设置日期值改变监听器
     private NumberPicker.OnValueChangeListener mOnDateChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -73,11 +74,13 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
+    //设置小时值改变监听器
     private NumberPicker.OnValueChangeListener mOnHourChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             boolean isDateChanged = false;
             Calendar cal = Calendar.getInstance();
+            //判断是否是24小时制的
             if (!mIs24HourView) {
                 if (!mIsAm && oldVal == HOURS_IN_HALF_DAY - 1 && newVal == HOURS_IN_HALF_DAY) {
                     cal.setTimeInMillis(mDate.getTimeInMillis());
@@ -107,6 +110,7 @@ public class DateTimePicker extends FrameLayout {
             int newHour = mHourSpinner.getValue() % HOURS_IN_HALF_DAY + (mIsAm ? 0 : HOURS_IN_HALF_DAY);
             mDate.set(Calendar.HOUR_OF_DAY, newHour);
             onDateTimeChanged();
+            //如果日期改变了，设置当前的年月日
             if (isDateChanged) {
                 setCurrentYear(cal.get(Calendar.YEAR));
                 setCurrentMonth(cal.get(Calendar.MONTH));
@@ -115,6 +119,7 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
+    //设置分钟值改变监听器
     private NumberPicker.OnValueChangeListener mOnMinuteChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -144,6 +149,7 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
+    //设置AM/PM值改变监听器
     private NumberPicker.OnValueChangeListener mOnAmPmChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -158,11 +164,13 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
+    //创建一个接口，用于创建修改日期的方法，上面的修改年月日分秒的方法都是继承这个接口
     public interface OnDateTimeChangedListener {
         void onDateTimeChanged(DateTimePicker view, int year, int month,
                 int dayOfMonth, int hourOfDay, int minute);
     }
 
+    //有参构造方法
     public DateTimePicker(Context context) {
         this(context, System.currentTimeMillis());
     }
@@ -175,30 +183,31 @@ public class DateTimePicker extends FrameLayout {
         super(context);
         mDate = Calendar.getInstance();
         mInitialising = true;
-        mIsAm = getCurrentHourOfDay() >= HOURS_IN_HALF_DAY;
+        mIsAm = getCurrentHourOfDay() >= HOURS_IN_HALF_DAY;//得到当天的时间然后和时间进行比较，判断上午或下午
         inflate(context, R.layout.datetime_picker, this);
 
         mDateSpinner = (NumberPicker) findViewById(R.id.date);
-        mDateSpinner.setMinValue(DATE_SPINNER_MIN_VAL);
-        mDateSpinner.setMaxValue(DATE_SPINNER_MAX_VAL);
+        mDateSpinner.setMinValue(DATE_SPINNER_MIN_VAL);//设置星期最小值
+        mDateSpinner.setMaxValue(DATE_SPINNER_MAX_VAL);//设置星期最大值
         mDateSpinner.setOnValueChangedListener(mOnDateChangedListener);
 
         mHourSpinner = (NumberPicker) findViewById(R.id.hour);
         mHourSpinner.setOnValueChangedListener(mOnHourChangedListener);
         mMinuteSpinner =  (NumberPicker) findViewById(R.id.minute);
-        mMinuteSpinner.setMinValue(MINUT_SPINNER_MIN_VAL);
-        mMinuteSpinner.setMaxValue(MINUT_SPINNER_MAX_VAL);
+        mMinuteSpinner.setMinValue(MINUT_SPINNER_MIN_VAL);//设置分钟最小值
+        mMinuteSpinner.setMaxValue(MINUT_SPINNER_MAX_VAL);//设置分钟最大值
         mMinuteSpinner.setOnLongPressUpdateInterval(100);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
 
         String[] stringsForAmPm = new DateFormatSymbols().getAmPmStrings();
         mAmPmSpinner = (NumberPicker) findViewById(R.id.amPm);
-        mAmPmSpinner.setMinValue(AMPM_SPINNER_MIN_VAL);
-        mAmPmSpinner.setMaxValue(AMPM_SPINNER_MAX_VAL);
+        mAmPmSpinner.setMinValue(AMPM_SPINNER_MIN_VAL);//设置是AM
+        mAmPmSpinner.setMaxValue(AMPM_SPINNER_MAX_VAL);//设置是PM
         mAmPmSpinner.setDisplayedValues(stringsForAmPm);
         mAmPmSpinner.setOnValueChangedListener(mOnAmPmChangedListener);
 
         // update controls to initial state
+        //更新初始状态
         updateDateControl();
         updateHourControl();
         updateAmPmControl();
@@ -206,6 +215,7 @@ public class DateTimePicker extends FrameLayout {
         set24HourView(is24HourView);
 
         // set to current time
+        //设置当前日期
         setCurrentDate(date);
 
         setEnabled(isEnabled());
@@ -214,6 +224,7 @@ public class DateTimePicker extends FrameLayout {
         mInitialising = false;
     }
 
+    //设置是否启用
     @Override
     public void setEnabled(boolean enabled) {
         if (mIsEnabled == enabled) {
@@ -234,7 +245,8 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get the current date in millis
-     *
+     * mills():用于返回的Arduino板开始运行当前程序时的毫秒数
+     * 得到当前日期的毫秒数
      * @return the current date in millis
      */
     public long getCurrentDateInTimeMillis() {
@@ -243,12 +255,13 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set the current date
-     *
+     * 设置当前日期
      * @param date The current date in millis
      */
     public void setCurrentDate(long date) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(date);
+        //设置年月日时分
         setCurrentDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH),
                 cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
     }
@@ -273,7 +286,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get current year
-     *
+     * 得到当前年份
      * @return The current year
      */
     public int getCurrentYear() {
@@ -282,7 +295,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set current year
-     *
+     *设置当前年份
      * @param year The current year
      */
     public void setCurrentYear(int year) {
@@ -296,7 +309,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get current month in the year
-     *
+     * 得到当年的月份
      * @return The current month in the year
      */
     public int getCurrentMonth() {
@@ -305,7 +318,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set current month in the year
-     *
+     * 设置当前年的月份
      * @param month The month in the year
      */
     public void setCurrentMonth(int month) {
@@ -319,7 +332,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get current day of the month
-     *
+     * 得到当月的日期
      * @return The day of the month
      */
     public int getCurrentDay() {
@@ -328,7 +341,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set current day of the month
-     *
+     * 设置当月的日期
      * @param dayOfMonth The day of the month
      */
     public void setCurrentDay(int dayOfMonth) {
@@ -342,6 +355,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get current hour in 24 hour mode, in the range (0~23)
+     * 得到24小时制的当天的小时
      * @return The current hour in 24 hour mode
      */
     public int getCurrentHourOfDay() {
@@ -351,7 +365,8 @@ public class DateTimePicker extends FrameLayout {
     private int getCurrentHour() {
         if (mIs24HourView){
             return getCurrentHourOfDay();
-        } else {
+        }//如果不是24小时制，就减去12
+        else {
             int hour = getCurrentHourOfDay();
             if (hour > HOURS_IN_HALF_DAY) {
                 return hour - HOURS_IN_HALF_DAY;
@@ -363,7 +378,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set current hour in 24 hour mode, in the range (0~23)
-     *
+     * 设置当前24小时制的小时
      * @param hourOfDay
      */
     public void setCurrentHour(int hourOfDay) {
@@ -391,7 +406,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Get currentMinute
-     *
+     * 得到当前分钟
      * @return The Current Minute
      */
     public int getCurrentMinute() {
@@ -400,6 +415,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set current minute
+     * 设置当前的分钟
      */
     public void setCurrentMinute(int minute) {
         if (!mInitialising && minute == getCurrentMinute()) {
@@ -412,6 +428,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * @return true if this is in 24 hour view else false.
+     * 如果是24小时制的，返回true
      */
     public boolean is24HourView () {
         return mIs24HourView;
@@ -419,7 +436,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set whether in 24 hour or AM/PM mode.
-     *
+     * 设置是否是24小时制
      * @param is24HourView True for 24 hour mode. False for AM/PM mode.
      */
     public void set24HourView(boolean is24HourView) {
@@ -434,6 +451,7 @@ public class DateTimePicker extends FrameLayout {
         updateAmPmControl();
     }
 
+    //更新日期控制器
     private void updateDateControl() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(mDate.getTimeInMillis());
@@ -445,9 +463,10 @@ public class DateTimePicker extends FrameLayout {
         }
         mDateSpinner.setDisplayedValues(mDateDisplayValues);
         mDateSpinner.setValue(DAYS_IN_ALL_WEEK / 2);
-        mDateSpinner.invalidate();
+        mDateSpinner.invalidate();//判断是否合法
     }
 
+    //更新AM/PM控制器
     private void updateAmPmControl() {
         if (mIs24HourView) {
             mAmPmSpinner.setVisibility(View.GONE);
@@ -458,6 +477,7 @@ public class DateTimePicker extends FrameLayout {
         }
     }
 
+    //更新小时控制器
     private void updateHourControl() {
         if (mIs24HourView) {
             mHourSpinner.setMinValue(HOUR_SPINNER_MIN_VAL_24_HOUR_VIEW);
@@ -470,6 +490,7 @@ public class DateTimePicker extends FrameLayout {
 
     /**
      * Set the callback that indicates the 'Set' button has been pressed.
+     *设置显示“Set”按钮已被按下的回调
      * @param callback the callback, if null will do nothing
      */
     public void setOnDateTimeChangedListener(OnDateTimeChangedListener callback) {

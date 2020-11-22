@@ -81,6 +81,7 @@ public class Note {
         mNoteDiffValues.put(NoteColumns.MODIFIED_DATE, System.currentTimeMillis());
     }
 
+    //setter方法
     public void setTextData(String key, String value) {
         mNoteData.setTextData(key, value);
     }
@@ -139,8 +140,10 @@ public class Note {
     }
 
     private class NoteData {
+        //定义Id
         private long mTextDataId;
 
+        //定义文本值
         private ContentValues mTextDataValues;
 
         private long mCallDataId;
@@ -251,6 +254,7 @@ public class Note {
             //返回便签数据
             if (operationList.size() > 0) {
                 try {
+                    //访问相应资源
                     ContentProviderResult[] results = context.getContentResolver().applyBatch(
                             Notes.AUTHORITY, operationList);
                     return (results == null || results.length == 0 || results[0] == null) ? null
