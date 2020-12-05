@@ -48,10 +48,13 @@ public class WorkingNote {
     // 修改日期
     private long mModifiedDate;
 
+    // 颜色id
     private int mBgColorId;
 
+    // 小装置的id
     private int mWidgetId;
 
+    // 小装置的类型
     private int mWidgetType;
 
     // 文件夹Id
@@ -75,6 +78,7 @@ public class WorkingNote {
             DataColumns.DATA4,
     };
 
+    // 存入便签各种数据
     public static final String[] NOTE_PROJECTION = new String[] {
             NoteColumns.PARENT_ID,
             NoteColumns.ALERTED_DATE,
