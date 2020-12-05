@@ -230,6 +230,8 @@ public class NotesPreferenceActivity extends PreferenceActivity {
 
     /**
      * 更新UI
+     * 重新加载账户的preference
+     * 重新加载同步按钮
      */
     private void refreshUI() {
         loadAccountPreference();
