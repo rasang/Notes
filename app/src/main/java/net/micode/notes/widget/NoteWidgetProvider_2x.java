@@ -40,8 +40,10 @@ public class NoteWidgetProvider_2x extends NoteWidgetProvider {
         return R.layout.widget_2x;
     }
 
+
+
     /**
-     * 资源调用访问
+     * 资源调用访问的类
      * @param bgId
      * @return
      */
