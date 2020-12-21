@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 /*
-* 警告接收者，继承于广播接收者
+* 闹钟接收者，继承于广播接收者
 * 通过intent接收来自AlarmAlertActivity广播传的值
 * */
 public class AlarmReceiver extends BroadcastReceiver {

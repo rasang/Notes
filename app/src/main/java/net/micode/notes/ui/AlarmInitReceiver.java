@@ -28,7 +28,7 @@ import net.micode.notes.data.Notes;
 import net.micode.notes.data.Notes.NoteColumns;
 
 /**
-* 初始化警告接收者
+* 初始化闹钟
 */
 public class AlarmInitReceiver extends BroadcastReceiver {
 
