@@ -43,7 +43,7 @@ public class NoteWidgetProvider_2x extends NoteWidgetProvider {
 
 
     /**
-     * 资源调用访问的类
+     * 资源调用访问的类的方法
      * @param bgId
      * @return
      */
