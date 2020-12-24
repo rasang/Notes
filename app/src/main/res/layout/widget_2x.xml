@@ -33,7 +33,7 @@
         android:paddingLeft="15dip"
         android:paddingRight="15dip"
         android:textSize="14sp"
-        android:textColor="#FF663300"
+        android:textColor="#FF003300"
         android:maxLines="6"
         android:lineSpacingMultiplier="1.2" />
 </FrameLayout>
