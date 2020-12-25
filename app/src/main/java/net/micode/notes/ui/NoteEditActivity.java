@@ -654,7 +654,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
      * @param minutes
      */
     private void createAlarm(int hour, int minutes) {
-        String message = "weak";
+        String message = "便签提醒";
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                 //闹钟的小时
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
