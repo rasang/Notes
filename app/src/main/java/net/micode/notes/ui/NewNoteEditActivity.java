@@ -1,11 +1,15 @@
 package net.micode.notes.ui;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -20,19 +24,36 @@ import net.micode.notes.model.WorkingNote;
 import net.micode.notes.tool.ResourceParser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class NewNoteEditActivity extends FragmentActivity {
 
-    WorkingNote workingNote;
-    RenderFragment renderFragment;
-    PlaintFragment plaintFragment;
+    private WorkingNote workingNote;
+    private RenderFragment renderFragment;
+    private PlaintFragment plaintFragment;
+    private Calendar calendar = Calendar.getInstance();
+    private int hour = calendar.get(Calendar.HOUR);
+    private int minute = calendar.get(Calendar.MINUTE);
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_note_edit);
         initTab();
+    }
+
+    public void addAlarm(View view){
+        context = this;
+        TimePickerDialog timePickerDialog = new TimePickerDialog(NewNoteEditActivity.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int h, int m) {
+                CreateAlarm ccreate = new CreateAlarm();
+                ccreate.addAlarm(h, m, context, workingNote.getContent());
+            }
+        },hour, minute, true);
+        timePickerDialog.show();
     }
 
     public void initTab(){
