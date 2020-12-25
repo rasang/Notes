@@ -50,7 +50,9 @@ public class RenderFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_render, container, false);
         MarkdownView markdownView = view.findViewById(R.id.container);
-        markdownView.loadMarkdown(initContent);
+        if(initContent != null){
+            markdownView.loadMarkdown(initContent);
+        }
         markdownView.addStyleSheet(new Github());
         return view;
     }

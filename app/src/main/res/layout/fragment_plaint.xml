@@ -3,13 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.PlaintFragment">
+    tools:context=".ui.PlaintFragment"
+    android:background="#FFFFFF">
 
     <EditText
         android:id="@+id/editor"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="top"
-        android:background="#FFFFFF"/>
+        android:background="#FFFFFF"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="25dp"/>
 
 </FrameLayout>
