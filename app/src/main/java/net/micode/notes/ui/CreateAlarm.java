@@ -1,13 +1,13 @@
 package net.micode.notes.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.provider.AlarmClock;
 
 class CreateAlarm extends Activity {
 
-    public void addAlarm(int hour, int minutes) {
-        String message = "便签提醒";
+    public void addAlarm(int hour, int minutes, Context context, String message) {
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
                 //闹钟的小时
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
@@ -19,7 +19,7 @@ class CreateAlarm extends Activity {
                 .putExtra(AlarmClock.EXTRA_VIBRATE, true)
                 //如果为true，则调用startActivity()不会进入手机的闹钟设置界面
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-        startActivity(intent);
+        context.startActivity(intent);
         //Toast.makeText(getApplicationContext(),"设置完毕",Toast.LENGTH_SHORT).show();
     }
 
