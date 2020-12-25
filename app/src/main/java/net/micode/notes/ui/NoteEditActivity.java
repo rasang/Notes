@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.AlarmClock;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -652,10 +653,38 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         d.setOnDateTimeSetListener(new OnDateTimeSetListener() {
             public void OnDateTimeSet(AlertDialog dialog, long date) {
                 mWorkingNote.setAlertDate(date	, true);
+                long allSeconds = date/1000;
+                int hour = (int) ((allSeconds/3600)%24-4);
+                int minute =(int) (allSeconds/60)%60;
+                createAlarm(hour,minute);
+                //Toast.makeText(getApplicationContext(),hour+"时"+minute+"分",Toast.LENGTH_SHORT).show();
             }
         });
         d.show();
     }
+
+    /**
+     * 设置系统闹钟
+     * @param hour
+     * @param minutes
+     */
+    private void createAlarm(int hour, int minutes) {
+        String message = "便签提醒";
+        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM)
+                //闹钟的小时
+                .putExtra(AlarmClock.EXTRA_HOUR, hour)
+                //闹钟的分钟
+                .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
+                //响铃时提示的信息
+                .putExtra(AlarmClock.EXTRA_MESSAGE, message)
+                //用于指定该闹铃触发时是否振动
+                .putExtra(AlarmClock.EXTRA_VIBRATE, true)
+                //如果为true，则调用startActivity()不会进入手机的闹钟设置界面
+                .putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+        startActivity(intent);
+        //Toast.makeText(getApplicationContext(),"设置完毕",Toast.LENGTH_SHORT).show();
+    }
+
 
     /**
      * Share note to apps that support {@link Intent#ACTION_SEND} action
