@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+     >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="right">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150px"
+
+            >
+            <TextView
+                android:id="@+id/notes_title"
+                android:layout_width="wrap_content"
+                android:layout_height="150px"
+                android:text="便签"
+                android:textSize="120px"
+
+                >
+            </TextView>
+            <ImageView
+                android:layout_width="80px"
+                android:layout_height="150px"
+                android:src="@drawable/menu"
+                android:layout_alignParentRight="true"
+
+                />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120px"
+            android:orientation="horizontal">
+            <ImageView
+                android:src="@drawable/search"
+                android:layout_width="120px"
+                android:layout_height="match_parent">
+
+            </ImageView>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="120px"
+                android:id="@+id/search_badge"
+                android:background="@drawable/shape"
+                >
+
+            </EditText>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:text="共几条"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="70px"
+            >
+
+        </TextView>
+        <com.etsy.android.grid.StaggeredGridView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:column_count_landscape="2"
+            app:column_count_portrait="2"
+            app:item_margin="20px" />
+
+    </LinearLayout>
+    <ImageView
+        android:layout_width="250px"
+        android:layout_height="250px"
+        android:src="@drawable/add"
+        android:layout_gravity="bottom|right">
+
+    </ImageView>
+
+
+</FrameLayout>
