@@ -80,6 +80,29 @@
                 android:resource="@xml/searchable" />
         </activity>
 
+        <activity
+            android:name=".ui.NewNoteEditActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@style/NoteTheme" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.INSERT_OR_EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/text_note" />
+                <data android:mimeType="vnd.android.cursor.item/call_note" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
         <provider
             android:name="net.micode.notes.data.NotesProvider"
             android:authorities="micode_notes"

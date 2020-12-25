@@ -509,7 +509,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     }
     // 新建便签
     private void createNewNote() {
-        Intent intent = new Intent(this, NoteEditActivity.class);
+        Intent intent = new Intent(this, NewNoteEditActivity.class);
         intent.setAction(Intent.ACTION_INSERT_OR_EDIT);
         intent.putExtra(Notes.INTENT_EXTRA_FOLDER_ID, mCurrentFolderId);
         this.startActivityForResult(intent, REQUEST_CODE_NEW_NODE);
@@ -581,7 +581,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     }
     // 打开便签，这里应该是笔误
     private void openNode(NoteItemData data) {
-        Intent intent = new Intent(this, NoteEditActivity.class);
+        Intent intent = new Intent(this, NewNoteEditActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.putExtra(Intent.EXTRA_UID, data.getId());
         this.startActivityForResult(intent, REQUEST_CODE_OPEN_NODE);
