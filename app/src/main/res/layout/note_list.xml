@@ -18,13 +18,66 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/list_background">
+    android:layout_height="fill_parent">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150px"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/note_name"
+                android:layout_width="wrap_content"
+                android:layout_height="150px"
+                android:text="便签"
+                android:textSize="115px">
+
+            </TextView>
+            <ImageView
+                android:id="@+id/menu_button"
+                android:layout_width="100px"
+                android:layout_height="150px"
+                android:src="@drawable/menu"
+                android:layout_alignParentRight="true">
+
+            </ImageView>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="150px"
+                android:layout_height="120px"
+                android:src="@drawable/search">
+
+            </ImageView>
+            <EditText
+                android:id="@+id/search_box"
+                android:layout_width="match_parent"
+                android:layout_height="120px"
+                android:background="@drawable/shape">
+
+            </EditText>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/note_num"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:text="2条记录"
+            android:textSize="70px"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+        </TextView>
 
         <TextView
             android:id="@+id/tv_title_bar"
@@ -50,9 +103,11 @@
 
     <Button
         android:id="@+id/btn_new_note"
-        android:background="@drawable/new_note"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:background="@drawable/add"
+        android:layout_width="250px"
+        android:layout_height="250px"
         android:focusable="false"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="15px"
+        android:layout_marginRight="15px"/>
 </FrameLayout>
